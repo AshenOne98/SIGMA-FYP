@@ -30,6 +30,8 @@ dependencies:
   cupertino_icons: ^1.0.0
   font_awesome_flutter: ^8.11.0
   percent_indicator: "^2.1.7+2"
+  rflutter_alert: ^1.1.0
+
 
 
 dev_dependencies:
