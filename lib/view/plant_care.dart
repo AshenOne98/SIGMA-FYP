@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:smart_indoor_garden_monitoring/shared/constants.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/appbar_content.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/bottom_navbar.dart';
-import 'package:smart_indoor_garden_monitoring/view/components/home_content.dart';
+import 'package:smart_indoor_garden_monitoring/view/components/plant_care_content.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/reusable_card.dart';
 
 class PlantCare extends StatefulWidget {
@@ -26,15 +27,17 @@ class _PlantCareState extends State<PlantCare> {
                 Expanded(
                   child: ReusableCard(
                     color: kActiveCardColor,
-                    cardChild: HomeContent(
+                    cardChild: PlantCareContent(
                       label: 'light intensity',
+                      icon: FontAwesomeIcons.lightbulb,
                     ),
                   ),
                 ),
                 Expanded(
                   child: ReusableCard(
                     color: kActiveCardColor,
-                    cardChild: HomeContent(
+                    cardChild: PlantCareContent(
+                      icon: FontAwesomeIcons.leaf,
                       label: 'soil moisture',
                     ),
                   ),
@@ -48,16 +51,18 @@ class _PlantCareState extends State<PlantCare> {
                 Expanded(
                   child: ReusableCard(
                     color: kActiveCardColor,
-                    cardChild: HomeContent(
+                    cardChild: PlantCareContent(
                       label: 'air temperature',
+                      icon: FontAwesomeIcons.temperatureLow,
                     ),
                   ),
                 ),
                 Expanded(
                   child: ReusableCard(
                     color: kActiveCardColor,
-                    cardChild: HomeContent(
+                    cardChild: PlantCareContent(
                       label: 'air humidity',
+                      icon: FontAwesomeIcons.wind,
                     ),
                   ),
                 ),
@@ -72,7 +77,7 @@ class _PlantCareState extends State<PlantCare> {
             ),
           ),
           BottomNavBar(
-            selectedIndex: 0,
+            selectedIndex: 1,
           ),
         ],
       ),
