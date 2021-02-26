@@ -103,7 +103,7 @@ class _PlantCareState extends State<PlantCare> {
   void _showAlert(String label) async {
     final setSensorValue = await showDialog<double>(
         context: context,
-        barrierDismissible: false, // user must tap button!
+        barrierDismissible: true,
         builder: (BuildContext context) {
           return AlertBox(initialSensorValue: _sensorValue, label: label);
         });

@@ -25,7 +25,9 @@ class _AlertBoxState extends State<AlertBox> {
       content: SingleChildScrollView(
         child: ListBody(
           children: <Widget>[
-            Text('Current minimum value: ${_sensorValue.toStringAsFixed(2)}'),
+            Text(
+                'Current minimum value: ${widget.initialSensorValue.toStringAsFixed(2)}'),
+            Text('Set minimum value: ${_sensorValue.toStringAsFixed(2)}'),
             SizedBox(
               height: 10.0,
             ),
@@ -50,17 +52,28 @@ class _AlertBoxState extends State<AlertBox> {
                 },
               ),
             ),
+            Container(
+              margin: EdgeInsets.all(20),
+              child: FlatButton(
+                child: Text('Set'),
+                color: Colors.blueAccent,
+                textColor: Colors.white,
+                onPressed: () {
+                  Navigator.pop(context, _sensorValue);
+                },
+              ),
+            ),
           ],
         ),
       ),
-      actions: <Widget>[
-        TextButton(
-          child: Text('Approve'),
-          onPressed: () {
-            Navigator.pop(context, _sensorValue);
-          },
-        ),
-      ],
+      // actions: <Widget>[
+      //   TextButton(
+      //     child: Text('Set'),
+      //     onPressed: () {
+      //       Navigator.pop(context, _sensorValue);
+      //     },
+      //   ),
+      // ],
     );
   }
 }
