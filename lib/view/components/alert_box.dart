@@ -1,0 +1,66 @@
+import 'package:flutter/material.dart';
+
+class AlertBox extends StatefulWidget {
+  final double initialSensorValue;
+  final String label;
+
+  AlertBox({this.initialSensorValue, this.label});
+
+  @override
+  _AlertBoxState createState() => _AlertBoxState();
+}
+
+class _AlertBoxState extends State<AlertBox> {
+  double _sensorValue;
+
+  void initState() {
+    super.initState();
+    _sensorValue = widget.initialSensorValue;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Set Minimum ${widget.label}'),
+      content: SingleChildScrollView(
+        child: ListBody(
+          children: <Widget>[
+            Text('Current minimum value: ${_sensorValue.toStringAsFixed(2)}'),
+            SizedBox(
+              height: 10.0,
+            ),
+            SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                  inactiveTrackColor: Color(0xFF8D8E98),
+                  activeTrackColor: Colors.blue,
+                  thumbColor: Colors.blue,
+                  overlayColor: Colors.blue[100],
+                  thumbShape: RoundSliderThumbShape(enabledThumbRadius: 10.0),
+                  overlayShape: RoundSliderOverlayShape(overlayRadius: 20.0)),
+              child: Slider(
+                value: _sensorValue,
+                min: 0,
+                max: 100,
+                //activeColor: Colors.white, //Color(0xFFEB1555),
+                //inactiveColor: Color(0xFF8D8E98),
+                onChanged: (double newValue) {
+                  setState(() {
+                    _sensorValue = newValue;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: Text('Approve'),
+          onPressed: () {
+            Navigator.pop(context, _sensorValue);
+          },
+        ),
+      ],
+    );
+  }
+}
