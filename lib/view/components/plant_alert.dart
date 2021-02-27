@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
-class AlertBox extends StatefulWidget {
+class PlantAlert extends StatefulWidget {
   final double initialSensorValue;
   final String label;
 
-  AlertBox({this.initialSensorValue, this.label});
+  PlantAlert({this.initialSensorValue, this.label});
 
   @override
-  _AlertBoxState createState() => _AlertBoxState();
+  _PlantAlertState createState() => _PlantAlertState();
 }
 
-class _AlertBoxState extends State<AlertBox> {
+class _PlantAlertState extends State<PlantAlert> {
   double _sensorValue;
 
   void initState() {

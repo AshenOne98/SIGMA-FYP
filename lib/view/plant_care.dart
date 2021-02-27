@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:smart_indoor_garden_monitoring/shared/constants.dart';
-import 'package:smart_indoor_garden_monitoring/view/components/alert_box.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/appbar_content.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/bottom_navbar.dart';
+import 'package:smart_indoor_garden_monitoring/view/components/plant_alert.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/plant_care_content.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/reusable_card.dart';
 
@@ -110,7 +110,7 @@ class _PlantCareState extends State<PlantCare> {
         context: context,
         barrierDismissible: true,
         builder: (BuildContext context) {
-          return AlertBox(initialSensorValue: _sensorValue, label: label);
+          return PlantAlert(initialSensorValue: _sensorValue, label: label);
         });
     if (setSensorValue != null) {
       setState(() {
