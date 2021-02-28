@@ -7,6 +7,8 @@ import 'package:smart_indoor_garden_monitoring/view/components/plant_alert.dart'
 import 'package:smart_indoor_garden_monitoring/view/components/plant_care_content.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/reusable_card.dart';
 
+enum Sensor { light, soil, temperature, humidity }
+
 class PlantCare extends StatefulWidget {
   @override
   _PlantCareState createState() => _PlantCareState();
@@ -36,7 +38,7 @@ class _PlantCareState extends State<PlantCare> {
                   child: ReusableCard(
                     color: kActiveCardColor,
                     onPress: () {
-                      _showAlert('Light Intensity', _lightMinVal);
+                      _showAlert('Light Intensity', _lightMinVal, Sensor.light);
                     },
                     cardChild: PlantCareContent(
                       label: 'light intensity',
@@ -48,7 +50,7 @@ class _PlantCareState extends State<PlantCare> {
                   child: ReusableCard(
                     color: kActiveCardColor,
                     onPress: () {
-                      _showAlert('Soil Moisture', _soilMinVal);
+                      _showAlert('Soil Moisture', _soilMinVal, Sensor.soil);
                     },
                     cardChild: PlantCareContent(
                       icon: FontAwesomeIcons.leaf,
@@ -66,7 +68,8 @@ class _PlantCareState extends State<PlantCare> {
                   child: ReusableCard(
                     color: kActiveCardColor,
                     onPress: () {
-                      _showAlert('Air Temperature', _tempMinVal);
+                      _showAlert(
+                          'Air Temperature', _tempMinVal, Sensor.temperature);
                     },
                     cardChild: PlantCareContent(
                       label: 'air temperature',
@@ -78,7 +81,7 @@ class _PlantCareState extends State<PlantCare> {
                   child: ReusableCard(
                     color: kActiveCardColor,
                     onPress: () {
-                      _showAlert('Air Humidity', _humidMinVal);
+                      _showAlert('Air Humidity', _humidMinVal, Sensor.humidity);
                     },
                     cardChild: PlantCareContent(
                       label: 'air humidity',
@@ -104,7 +107,7 @@ class _PlantCareState extends State<PlantCare> {
     );
   }
 
-  void _showAlert(String label, double value) async {
+  void _showAlert(String label, double value, Sensor selectedSensor) async {
     _sensorValue = value;
     final setSensorValue = await showDialog<double>(
         context: context,
@@ -115,6 +118,15 @@ class _PlantCareState extends State<PlantCare> {
     if (setSensorValue != null) {
       setState(() {
         _sensorValue = setSensorValue;
+        if (selectedSensor == Sensor.light) {
+          _lightMinVal = _sensorValue;
+        } else if (selectedSensor == Sensor.soil) {
+          _soilMinVal = _sensorValue;
+        } else if (selectedSensor == Sensor.temperature) {
+          _tempMinVal = _sensorValue;
+        } else {
+          _humidMinVal = _sensorValue;
+        }
       });
     }
   }

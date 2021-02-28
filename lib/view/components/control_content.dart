@@ -4,8 +4,9 @@ import 'package:smart_indoor_garden_monitoring/shared/constants.dart';
 class ControlContent extends StatelessWidget {
   final String label;
   final IconData icon;
+  final String status;
 
-  ControlContent({@required this.label, @required this.icon});
+  ControlContent({@required this.label, @required this.icon, this.status});
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -22,6 +23,16 @@ class ControlContent extends StatelessWidget {
           label.toUpperCase(),
           style: kLabelTextStyle,
         ),
+        SizedBox(
+          height: 10.0,
+        ),
+        Text(
+          status,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color(0xFFFFA800),
+          ),
+        )
       ],
     );
   }

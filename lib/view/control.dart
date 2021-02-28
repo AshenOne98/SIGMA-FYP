@@ -3,8 +3,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:smart_indoor_garden_monitoring/shared/constants.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/appbar_content.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/bottom_navbar.dart';
+import 'package:smart_indoor_garden_monitoring/view/components/control_alert.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/control_content.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/reusable_card.dart';
+
+enum Device { fan, light, pump }
 
 class Control extends StatefulWidget {
   @override
@@ -12,6 +15,12 @@ class Control extends StatefulWidget {
 }
 
 class _ControlState extends State<Control> {
+  bool _fanStatus = true;
+  bool _lightStatus = false;
+  bool _pumpStatus = false;
+
+  bool _deviceStatus;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,20 +47,26 @@ class _ControlState extends State<Control> {
                 Expanded(
                   child: ReusableCard(
                     color: kActiveCardColor,
-                    onPress: () {},
+                    onPress: () {
+                      _showAlert('Exhaust Fan', _fanStatus, Device.fan);
+                    },
                     cardChild: ControlContent(
                       label: 'exhaust fan',
                       icon: FontAwesomeIcons.fan,
+                      status: _fanStatus == true ? 'ON' : 'OFF',
                     ),
                   ),
                 ),
                 Expanded(
                   child: ReusableCard(
                     color: kActiveCardColor,
-                    onPress: () {},
+                    onPress: () {
+                      _showAlert('Grow Light', _lightStatus, Device.light);
+                    },
                     cardChild: ControlContent(
                       icon: FontAwesomeIcons.solidLightbulb,
                       label: 'grow light',
+                      status: _lightStatus == true ? 'ON' : 'OFF',
                     ),
                   ),
                 ),
@@ -64,10 +79,13 @@ class _ControlState extends State<Control> {
               height: MediaQuery.of(context).size.height,
               child: ReusableCard(
                 color: kActiveCardColor,
-                onPress: () {},
+                onPress: () {
+                  _showAlert('Water Pump', _pumpStatus, Device.pump);
+                },
                 cardChild: ControlContent(
                   icon: FontAwesomeIcons.handHoldingWater,
                   label: 'water pump',
+                  status: _pumpStatus == true ? 'ON' : 'OFF',
                 ),
               ),
             ),
@@ -85,5 +103,27 @@ class _ControlState extends State<Control> {
         ],
       ),
     );
+  }
+
+  void _showAlert(String label, bool status, Device selectedDevice) async {
+    _deviceStatus = status;
+    final setDeviceStatus = await showDialog<bool>(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return ControlAlert(initialDeviceStatus: _deviceStatus, label: label);
+        });
+    if (setDeviceStatus != null) {
+      setState(() {
+        _deviceStatus = setDeviceStatus;
+        if (selectedDevice == Device.fan) {
+          _fanStatus = _deviceStatus;
+        } else if (selectedDevice == Device.light) {
+          _lightStatus = _deviceStatus;
+        } else {
+          _pumpStatus = _deviceStatus;
+        }
+      });
+    }
   }
 }
