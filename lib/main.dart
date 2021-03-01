@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smart_indoor_garden_monitoring/view/control.dart';
 import 'package:smart_indoor_garden_monitoring/view/home.dart';
+import 'package:smart_indoor_garden_monitoring/view/log.dart';
 import 'package:smart_indoor_garden_monitoring/view/plant_care.dart';
 
 void main() {
@@ -16,6 +17,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => Home(),
         '/plantCare': (context) => PlantCare(),
         '/control': (context) => Control(),
+        '/log': (context) => Log(),
       },
       theme: ThemeData.dark().copyWith(
         primaryColor: Color(0xFF1F2025),

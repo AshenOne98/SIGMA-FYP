@@ -54,6 +54,9 @@ class _BottomNavBarState extends State<BottomNavBar> {
               Navigator.pushNamedAndRemoveUntil(
                   context, '/control', (_) => false);
               break;
+            case 3:
+              Navigator.pushNamedAndRemoveUntil(context, '/log', (_) => false);
+              break;
             default:
           }
         },
