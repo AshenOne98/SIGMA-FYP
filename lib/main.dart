@@ -3,6 +3,7 @@ import 'package:smart_indoor_garden_monitoring/view/control.dart';
 import 'package:smart_indoor_garden_monitoring/view/home.dart';
 import 'package:smart_indoor_garden_monitoring/view/log.dart';
 import 'package:smart_indoor_garden_monitoring/view/plant_care.dart';
+import 'package:smart_indoor_garden_monitoring/view/report.dart';
 
 void main() {
   runApp(MyApp());
@@ -18,6 +19,7 @@ class MyApp extends StatelessWidget {
         '/plantCare': (context) => PlantCare(),
         '/control': (context) => Control(),
         '/log': (context) => Log(),
+        '/report': (context) => Report(),
       },
       theme: ThemeData.dark().copyWith(
         primaryColor: Color(0xFF1F2025),

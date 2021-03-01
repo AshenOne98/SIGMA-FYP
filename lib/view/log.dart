@@ -16,6 +16,7 @@ class _LogState extends State<Log> {
   @override
   void initState() {
     // TODO: implement initState
+    super.initState();
     logs = LogType.warning;
   }
 
