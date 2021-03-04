@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
-class HomeContent extends StatelessWidget {
+class HomeContent extends StatefulWidget {
   final String label;
+  final String value;
 
-  HomeContent({@required this.label});
+  HomeContent({@required this.label, this.value});
+  @override
+  _HomeContentState createState() => _HomeContentState();
+}
+
+class _HomeContentState extends State<HomeContent> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -16,7 +22,7 @@ class HomeContent extends StatelessWidget {
           animation: true,
           percent: 0.7,
           center: Text(
-            "70.0%",
+            widget.value != null ? widget.value : '70.0%',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 20.0,
@@ -25,7 +31,7 @@ class HomeContent extends StatelessWidget {
           footer: Padding(
             padding: EdgeInsets.only(top: 15.0),
             child: Text(
-              label.toUpperCase(),
+              widget.label.toUpperCase(),
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 15.0,

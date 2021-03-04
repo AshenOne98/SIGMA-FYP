@@ -32,6 +32,10 @@ dependencies:
   percent_indicator: "^2.1.7+2"
   rflutter_alert: ^1.1.0
 
+  
+  firebase_core: ^0.7.0
+  firebase_database: ^6.0.0
+
 
 
 dev_dependencies:
