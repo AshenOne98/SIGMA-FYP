@@ -61,7 +61,11 @@ class _ControlAlertState extends State<ControlAlert> {
             )),
             Container(
               margin: EdgeInsets.all(20),
-              child: FlatButton(
+              child: RaisedButton(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5.0),
+                ),
+                elevation: 3.0,
                 child: Text('Set'),
                 color: Colors.blueAccent,
                 textColor: Colors.white,

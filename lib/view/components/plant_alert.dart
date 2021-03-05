@@ -54,7 +54,11 @@ class _PlantAlertState extends State<PlantAlert> {
             ),
             Container(
               margin: EdgeInsets.all(20),
-              child: FlatButton(
+              child: RaisedButton(
+                elevation: 3.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5.0),
+                ),
                 child: Text('Set'),
                 color: Colors.blueAccent,
                 textColor: Colors.white,

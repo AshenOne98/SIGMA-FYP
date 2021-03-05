@@ -31,6 +31,7 @@ class ControlContent extends StatelessWidget {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Color(0xFFFFA800),
+            fontSize: 17.0,
           ),
         )
       ],

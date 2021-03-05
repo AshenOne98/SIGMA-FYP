@@ -36,6 +36,27 @@ class _PlantCareState extends State<PlantCare> {
         ),
         body: Column(
           children: [
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 15.0),
+              child: Column(
+                children: [
+                  Text(
+                    'PLANT CARE ',
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFFFFA800),
+                    ),
+                  ),
+                  // Text(
+                  //   'Adjust minimum value for each sensor',
+                  //   style: TextStyle(
+                  //     fontSize: 15.0,
+                  //   ),
+                  // )
+                ],
+              ),
+            ),
             Expanded(
               child: Row(
                 children: [
@@ -49,6 +70,7 @@ class _PlantCareState extends State<PlantCare> {
                       cardChild: PlantCareContent(
                         label: 'light intensity',
                         icon: FontAwesomeIcons.lightbulb,
+                        status: _lightMinVal.toStringAsFixed(2),
                       ),
                     ),
                   ),
@@ -61,6 +83,7 @@ class _PlantCareState extends State<PlantCare> {
                       cardChild: PlantCareContent(
                         icon: FontAwesomeIcons.leaf,
                         label: 'soil moisture',
+                        status: _soilMinVal.toStringAsFixed(2),
                       ),
                     ),
                   ),
@@ -80,6 +103,7 @@ class _PlantCareState extends State<PlantCare> {
                       cardChild: PlantCareContent(
                         label: 'air temperature',
                         icon: FontAwesomeIcons.temperatureLow,
+                        status: _tempMinVal.toStringAsFixed(2),
                       ),
                     ),
                   ),
@@ -93,6 +117,7 @@ class _PlantCareState extends State<PlantCare> {
                       cardChild: PlantCareContent(
                         label: 'air humidity',
                         icon: FontAwesomeIcons.wind,
+                        status: _humidMinVal.toStringAsFixed(2),
                       ),
                     ),
                   ),
