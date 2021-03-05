@@ -44,7 +44,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         onTap: (index) {
           switch (index) {
             case 0:
-              Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
+              Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
               break;
             case 1:
               Navigator.pushNamedAndRemoveUntil(

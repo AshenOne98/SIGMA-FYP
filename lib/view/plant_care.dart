@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:smart_indoor_garden_monitoring/shared/constants.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/appbar_content.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/bottom_navbar.dart';
+import 'package:smart_indoor_garden_monitoring/view/components/exit_dialog.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/plant_alert.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/plant_care_content.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/reusable_card.dart';
@@ -24,85 +25,92 @@ class _PlantCareState extends State<PlantCare> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(75.0),
-        child: AppBarContent(),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Row(
-              children: [
-                Expanded(
-                  child: ReusableCard(
-                    color: kActiveCardColor,
-                    onPress: () {
-                      _showAlert('Light Intensity', _lightMinVal, Sensor.light);
-                    },
-                    cardChild: PlantCareContent(
-                      label: 'light intensity',
-                      icon: FontAwesomeIcons.lightbulb,
+    return WillPopScope(
+      onWillPop: () async {
+        return onBackPressed(context);
+      },
+      child: Scaffold(
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(75.0),
+          child: AppBarContent(),
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ReusableCard(
+                      color: kActiveCardColor,
+                      onPress: () {
+                        _showAlert(
+                            'Light Intensity', _lightMinVal, Sensor.light);
+                      },
+                      cardChild: PlantCareContent(
+                        label: 'light intensity',
+                        icon: FontAwesomeIcons.lightbulb,
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: ReusableCard(
-                    color: kActiveCardColor,
-                    onPress: () {
-                      _showAlert('Soil Moisture', _soilMinVal, Sensor.soil);
-                    },
-                    cardChild: PlantCareContent(
-                      icon: FontAwesomeIcons.leaf,
-                      label: 'soil moisture',
+                  Expanded(
+                    child: ReusableCard(
+                      color: kActiveCardColor,
+                      onPress: () {
+                        _showAlert('Soil Moisture', _soilMinVal, Sensor.soil);
+                      },
+                      cardChild: PlantCareContent(
+                        icon: FontAwesomeIcons.leaf,
+                        label: 'soil moisture',
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          Expanded(
-            child: Row(
-              children: [
-                Expanded(
-                  child: ReusableCard(
-                    color: kActiveCardColor,
-                    onPress: () {
-                      _showAlert(
-                          'Air Temperature', _tempMinVal, Sensor.temperature);
-                    },
-                    cardChild: PlantCareContent(
-                      label: 'air temperature',
-                      icon: FontAwesomeIcons.temperatureLow,
+            Expanded(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ReusableCard(
+                      color: kActiveCardColor,
+                      onPress: () {
+                        _showAlert(
+                            'Air Temperature', _tempMinVal, Sensor.temperature);
+                      },
+                      cardChild: PlantCareContent(
+                        label: 'air temperature',
+                        icon: FontAwesomeIcons.temperatureLow,
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: ReusableCard(
-                    color: kActiveCardColor,
-                    onPress: () {
-                      _showAlert('Air Humidity', _humidMinVal, Sensor.humidity);
-                    },
-                    cardChild: PlantCareContent(
-                      label: 'air humidity',
-                      icon: FontAwesomeIcons.wind,
+                  Expanded(
+                    child: ReusableCard(
+                      color: kActiveCardColor,
+                      onPress: () {
+                        _showAlert(
+                            'Air Humidity', _humidMinVal, Sensor.humidity);
+                      },
+                      cardChild: PlantCareContent(
+                        label: 'air humidity',
+                        icon: FontAwesomeIcons.wind,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          SizedBox(
-            height: 20.0,
-            width: MediaQuery.of(context).size.width / 1.1,
-            child: Divider(
-              color: Colors.white,
+            SizedBox(
+              height: 20.0,
+              width: MediaQuery.of(context).size.width / 1.1,
+              child: Divider(
+                color: Colors.white,
+              ),
             ),
-          ),
-          BottomNavBar(
-            selectedIndex: 1,
-          ),
-        ],
+            BottomNavBar(
+              selectedIndex: 1,
+            ),
+          ],
+        ),
       ),
     );
   }

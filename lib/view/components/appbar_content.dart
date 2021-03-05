@@ -6,6 +6,7 @@ class AppBarContent extends StatelessWidget {
     double width = MediaQuery.of(context).size.width * 0.01;
 
     return AppBar(
+      automaticallyImplyLeading: false,
       title: Center(
         child: Padding(
           padding: EdgeInsets.only(top: 10.0),

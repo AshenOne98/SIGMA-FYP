@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:smart_indoor_garden_monitoring/shared/constants.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/appbar_content.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/bottom_navbar.dart';
+import 'package:smart_indoor_garden_monitoring/view/components/exit_dialog.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/home_content.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/reusable_card.dart';
 
@@ -26,12 +27,16 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(75.0),
-        child: AppBarContent(),
-      ),
-      body: StreamBuilder(
+    return WillPopScope(
+      onWillPop: () async {
+        return onBackPressed(context);
+      },
+      child: Scaffold(
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(75.0),
+          child: AppBarContent(),
+        ),
+        body: StreamBuilder(
           stream: dbRef.child("SIGMA").onValue,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
@@ -96,11 +101,15 @@ class _HomeState extends State<Home> {
                 ],
               );
             } else {
-              return Container(
-                child: Text('Loading'),
+              return Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.lightBlueAccent,
+                ),
               );
             }
-          }),
+          },
+        ),
+      ),
     );
   }
 
@@ -123,4 +132,25 @@ class _HomeState extends State<Home> {
       //print('Value is $tempValue');
     });
   }
+
+  // Future<bool> _onBackPressed() {
+  //   return showDialog(
+  //     context: context,
+  //     builder: (context) => new AlertDialog(
+  //       title: new Text('Are you sure?'),
+  //       content: new Text('Do you want to exit an App'),
+  //       actions: <Widget>[
+  //         new GestureDetector(
+  //           onTap: () => Navigator.of(context).pop(false),
+  //           child: Text("NO"),
+  //         ),
+  //         SizedBox(height: 16),
+  //         new GestureDetector(
+  //           onTap: () => Navigator.of(context).pop(true),
+  //           child: Text("YES"),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }
