@@ -60,6 +60,7 @@ class _WelcomeState extends State<Welcome> with SingleTickerProviderStateMixin {
                     height: 70.0,
                   ),
                 ),
+                SizedBox(width: 10.0),
                 TypewriterAnimatedTextKit(
                   repeatForever: true,
                   speed: Duration(milliseconds: 600),

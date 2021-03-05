@@ -43,6 +43,7 @@ class _HomeState extends State<Home> {
               return Column(
                 children: [
                   Expanded(
+                    flex: 3,
                     child: Row(
                       children: [
                         Expanded(
@@ -65,6 +66,7 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                   Expanded(
+                    flex: 3,
                     child: Row(
                       children: [
                         Expanded(

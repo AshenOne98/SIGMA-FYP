@@ -13,10 +13,9 @@ class HomeContent extends StatefulWidget {
 class _HomeContentState extends State<HomeContent> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        CircularPercentIndicator(
+    return Center(
+      child: SingleChildScrollView(
+        child: CircularPercentIndicator(
           radius: 100.0,
           lineWidth: 13.0,
           animation: true,
@@ -41,7 +40,7 @@ class _HomeContentState extends State<HomeContent> {
           circularStrokeCap: CircularStrokeCap.round,
           progressColor: Colors.amber[800],
         ),
-      ],
+      ),
     );
   }
 }
