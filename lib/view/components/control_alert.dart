@@ -39,7 +39,7 @@ class _ControlAlertState extends State<ControlAlert> {
                   onChanged: (value) {
                     setState(() {
                       _isSwitched = value;
-                      print(_isSwitched);
+                      //print(_isSwitched);
                     });
                   },
                   activeTrackColor: Colors.lightBlue[100],

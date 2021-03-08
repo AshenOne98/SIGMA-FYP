@@ -17,6 +17,8 @@ class _HomeState extends State<Home> {
 
   var tempValue;
   var humidValue;
+  var lightValue;
+  var moistureValue;
 
   @override
   void initState() {
@@ -51,6 +53,7 @@ class _HomeState extends State<Home> {
                             color: kActiveCardColor,
                             cardChild: HomeContent(
                               label: 'light intensity',
+                              value: lightValue.toString() + "%",
                             ),
                           ),
                         ),
@@ -59,6 +62,7 @@ class _HomeState extends State<Home> {
                             color: kActiveCardColor,
                             cardChild: HomeContent(
                               label: 'soil moisture',
+                              value: moistureValue.toString() + '%',
                             ),
                           ),
                         ),
@@ -131,6 +135,8 @@ class _HomeState extends State<Home> {
 
       tempValue = await snapshot.value['temperature'];
       humidValue = await snapshot.value['humidity'];
+      lightValue = await snapshot.value['light'];
+      moistureValue = await snapshot.value['soil'];
       //print('Value is $tempValue');
     });
   }
