@@ -39,7 +39,7 @@ class _HomeState extends State<Home> {
           child: AppBarContent(),
         ),
         body: StreamBuilder(
-          stream: dbRef.child("SIGMA").onValue,
+          stream: dbRef.child("sensors").onValue,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return Column(
@@ -53,7 +53,7 @@ class _HomeState extends State<Home> {
                             color: kActiveCardColor,
                             cardChild: HomeContent(
                               label: 'light intensity',
-                              value: lightValue.toString() + "%",
+                              value: lightValue.toString(),
                             ),
                           ),
                         ),
@@ -62,7 +62,7 @@ class _HomeState extends State<Home> {
                             color: kActiveCardColor,
                             cardChild: HomeContent(
                               label: 'soil moisture',
-                              value: moistureValue.toString() + '%',
+                              value: moistureValue.toString(),
                             ),
                           ),
                         ),
@@ -78,7 +78,7 @@ class _HomeState extends State<Home> {
                             color: kActiveCardColor,
                             cardChild: HomeContent(
                               label: 'air temperature',
-                              value: tempValue.toString() + "°C",
+                              value: tempValue.toString(),
                             ),
                           ),
                         ),
@@ -87,7 +87,7 @@ class _HomeState extends State<Home> {
                             color: kActiveCardColor,
                             cardChild: HomeContent(
                               label: 'air humidity',
-                              value: humidValue.toString() + "%",
+                              value: humidValue.toString(),
                             ),
                           ),
                         ),
@@ -130,13 +130,13 @@ class _HomeState extends State<Home> {
   // }
 
   readData() {
-    dbRef.child('SIGMA').onValue.listen((event) async {
+    dbRef.child('sensors').onValue.listen((event) async {
       var snapshot = event.snapshot;
 
-      tempValue = await snapshot.value['temperature'];
-      humidValue = await snapshot.value['humidity'];
-      lightValue = await snapshot.value['light'];
-      moistureValue = await snapshot.value['soil'];
+      tempValue = await snapshot.value['tempSensor']['value'];
+      humidValue = await snapshot.value['humidSensor']['value'];
+      lightValue = await snapshot.value['lightSensor']['value'];
+      moistureValue = await snapshot.value['soilSensor']['value'];
       //print('Value is $tempValue');
     });
   }
