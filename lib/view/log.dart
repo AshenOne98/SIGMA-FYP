@@ -1,10 +1,21 @@
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:smart_indoor_garden_monitoring/shared/constants.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/appbar_content.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/bottom_navbar.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/exit_dialog.dart';
 
 enum LogType { warning, action }
+final dbRef = FirebaseDatabase.instance.reference();
+
+var status;
+var device;
+var timestamp;
+
+Query _ref;
 
 class Log extends StatefulWidget {
   @override
@@ -16,9 +27,11 @@ class _LogState extends State<Log> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     logs = LogType.warning;
+    _ref =
+        FirebaseDatabase.instance.reference().child('log').child("actionlog");
+    readData();
   }
 
   @override
@@ -85,7 +98,22 @@ class _LogState extends State<Log> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: LogContent(),
+                child: FirebaseAnimatedList(
+                  query: _ref,
+                  itemBuilder: (BuildContext context, DataSnapshot snapshot,
+                      Animation<double> animation, int index) {
+                    Map logContent = snapshot.value;
+                    if (logContent == null) {
+                      return Center(
+                        child: CircularProgressIndicator(
+                          backgroundColor: Colors.lightBlueAccent,
+                        ),
+                      );
+                    }
+
+                    return ActionLog(log: logContent);
+                  },
+                ),
               ),
             ),
             SizedBox(
@@ -103,60 +131,126 @@ class _LogState extends State<Log> {
       ),
     );
   }
+
+  readData() {
+    dbRef.child('log').child("actionlog").onValue.listen((event) async {
+      var snapshot = event.snapshot;
+
+      status = await snapshot.value['-MVWjhVyQDV0R8l_tDl6']['action'];
+      device = await snapshot.value['-MVWjhVyQDV0R8l_tDl6']['device'];
+      timestamp = await snapshot.value['-MVWjhVyQDV0R8l_tDl6']['timestamp'];
+
+      print(status);
+
+      //int count = snapshot.value.length;
+      //print(snapshot.value);
+
+      // if (device == 'fan') {
+      //   deviceType = 'Exhaust Fan';
+      // } else if (device == 'growlight') {
+      //   deviceType = 'Growth light';
+      // } else if (device == 'waterpump') {
+      //   deviceType = 'Water pump';
+      // } else {
+      //   deviceType = 'null';
+      // }
+
+      // if (status == true) {
+      //   action = 'On';
+      // } else if (status == false) {
+      //   action = 'Off';
+      // } else {
+      //   action = null;
+      // }
+
+      // var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+      // var formattedDate = DateFormat.yMd().add_jm().format(date);
+      // datetime = formattedDate;
+      // print(formattedDate);
+    });
+  }
 }
 
-class LogContent extends StatelessWidget {
-  const LogContent({
-    Key key,
-  }) : super(key: key);
+class ActionLog extends StatelessWidget {
+  final Map log;
+
+  const ActionLog({
+    this.log,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: const <Widget>[
-        Card(
-          child: ListTileTheme(
-            child: ListTile(
-              leading: FlutterLogo(size: 52.0),
-              title: Text('Three-line ListTile'),
-              subtitle:
-                  Text('A sufficiently long subtitle warrants three lines.'),
-              trailing: Icon(Icons.more_vert),
-              isThreeLine: true,
+    // return StreamBuilder(
+    //   stream: dbRef.child("log").child("actionlog").onValue,
+    //   builder: (context, snapshot) {
+    //  if (snapshot.hasData) {
+    //   return ListView.builder(
+    //     itemCount: count,
+    //     itemBuilder: (context, index) {
+
+    var status;
+    IconData icon;
+
+    log['action'] == true ? status = 'On' : status = 'Off';
+
+    log['device'] == 'Exhaust fan'
+        ? icon = FontAwesomeIcons.fan
+        : log['device'] == 'Growth light'
+            ? icon = FontAwesomeIcons.solidLightbulb
+            : icon = FontAwesomeIcons.handHoldingWater;
+
+    var date = DateTime.fromMillisecondsSinceEpoch(log['timestamp']);
+    var formattedDate = DateFormat.yMd().add_jm().format(date);
+
+    return Card(
+      child: ListTileTheme(
+        child: ListTile(
+          leading: Icon(
+            icon,
+            size: 40.0,
+            color: Colors.white,
+          ),
+          title: Text(
+            '${log['device']} turns $status',
+            style: TextStyle(
+              color: log['action'] == true ? Colors.green : Colors.red,
             ),
           ),
-        ),
-        Card(
-          child: ListTile(
-            leading: FlutterLogo(size: 52.0),
-            title: Text('Three-line ListTile'),
-            subtitle:
-                Text('A sufficiently long subtitle warrants three lines.'),
-            trailing: Icon(Icons.more_vert),
-            isThreeLine: true,
+          subtitle: Text('${log['device']} has been turned $status'),
+          trailing: Container(
+            width: 80.0,
+            child: Text(
+              '$formattedDate',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
+          isThreeLine: true,
         ),
-        Card(
-          child: ListTile(
-            leading: FlutterLogo(size: 52.0),
-            title: Text('Three-line ListTile'),
-            subtitle:
-                Text('A sufficiently long subtitle warrants three lines.'),
-            trailing: Icon(Icons.more_vert),
-            isThreeLine: true,
-          ),
-        ),
-        Card(
-          child: ListTile(
-            leading: FlutterLogo(size: 52.0),
-            title: Text('Three-line ListTile'),
-            subtitle:
-                Text('A sufficiently long subtitle warrants three lines.'),
-            trailing: Icon(Icons.more_vert),
-            isThreeLine: true,
-          ),
-        ),
-      ],
+      ),
     );
+
+    // Card(
+    //   child: ListTile(
+    //     leading: FlutterLogo(size: 52.0),
+    //     title: Text('Three-line ListTile'),
+    //     subtitle:
+    //         Text('A sufficiently long subtitle warrants three lines.'),
+    //     trailing: Icon(Icons.more_vert),
+    //     isThreeLine: true,
+    //   ),
+    // ),
+    //         },
+    //       );
+    //     } else {
+    //       return Center(
+    //         child: CircularProgressIndicator(
+    //           backgroundColor: Colors.lightBlueAccent,
+    //         ),
+    //       );
+    //     }
+    //   },
+    // );
   }
 }

@@ -148,12 +148,15 @@ class _ControlState extends State<Control> {
         if (selectedDevice == Device.fan) {
           _fanStatus = _deviceStatus;
           updateDeviceStatus('fan', _fanStatus);
+          addActionLog('Exhaust fan', _fanStatus);
         } else if (selectedDevice == Device.light) {
           _lightStatus = _deviceStatus;
           updateDeviceStatus('growlight', _lightStatus);
+          addActionLog('Growth light', _lightStatus);
         } else {
           _pumpStatus = _deviceStatus;
           updateDeviceStatus('waterpump', _pumpStatus);
+          addActionLog('Water pump', _pumpStatus);
         }
       });
     }
@@ -172,5 +175,13 @@ class _ControlState extends State<Control> {
 
   void updateDeviceStatus(deviceName, newStatus) async {
     await dbRef.child('device').child(deviceName).update({'status': newStatus});
+  }
+
+  void addActionLog(deviceName, newStatus) async {
+    await dbRef.child('log').child('actionlog').push().set({
+      'action': newStatus,
+      'device': deviceName,
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
+    });
   }
 }
