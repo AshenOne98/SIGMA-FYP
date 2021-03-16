@@ -15,7 +15,7 @@ var status;
 var device;
 var timestamp;
 
-Query _ref;
+Query _actionRef, _warningRef;
 
 class Log extends StatefulWidget {
   @override
@@ -29,10 +29,16 @@ class _LogState extends State<Log> {
   void initState() {
     super.initState();
     logs = LogType.warning;
-    _ref = FirebaseDatabase.instance
+    _actionRef = FirebaseDatabase.instance
         .reference()
         .child('log')
         .child("actionlog")
+        .orderByChild('timestamp');
+
+    _warningRef = FirebaseDatabase.instance
+        .reference()
+        .child('log')
+        .child("warninglog")
         .orderByChild('timestamp');
     //readData();
   }
@@ -101,22 +107,7 @@ class _LogState extends State<Log> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: FirebaseAnimatedList(
-                  query: _ref,
-                  itemBuilder: (BuildContext context, DataSnapshot snapshot,
-                      Animation<double> animation, int index) {
-                    Map logContent = snapshot.value;
-                    if (logContent == null) {
-                      return Center(
-                        child: CircularProgressIndicator(
-                          backgroundColor: Colors.lightBlueAccent,
-                        ),
-                      );
-                    }
-
-                    return ActionLog(log: logContent);
-                  },
-                ),
+                child: logs == LogType.warning ? WarningLog() : ActionLog(),
               ),
             ),
             SizedBox(
@@ -157,54 +148,137 @@ class _LogState extends State<Log> {
 }
 
 class ActionLog extends StatelessWidget {
-  final Map log;
-
-  const ActionLog({this.log});
-
   @override
   Widget build(BuildContext context) {
     var status;
     IconData icon;
-
-    log['action'] == true ? status = 'On' : status = 'Off';
-
-    log['device'] == 'Exhaust fan'
-        ? icon = FontAwesomeIcons.fan
-        : log['device'] == 'Growth light'
-            ? icon = FontAwesomeIcons.solidLightbulb
-            : icon = FontAwesomeIcons.handHoldingWater;
-
-    var date = DateTime.fromMillisecondsSinceEpoch(log['timestamp'] * -1);
-    var formattedDate = DateFormat('dd/MM/yyyy KK:mm a')
-        .format(date); //DateFormat.yMMMEd().add_jm().format(date);
-
-    return Card(
-      child: ListTileTheme(
-        child: ListTile(
-          leading: Icon(
-            icon,
-            size: 40.0,
-            color: Colors.white,
-          ),
-          title: Text(
-            '${log['device']} turns $status',
-            style: TextStyle(
-              color: log['action'] == true ? Colors.green : Colors.red,
+    return FirebaseAnimatedList(
+      query: _actionRef,
+      itemBuilder: (BuildContext context, DataSnapshot snapshot,
+          Animation<double> animation, int index) {
+        Map log = snapshot.value;
+        if (log == null) {
+          return Center(
+            child: CircularProgressIndicator(
+              backgroundColor: Colors.lightBlueAccent,
             ),
-          ),
-          subtitle: Text('${log['device']} has been turned $status'),
-          trailing: Container(
-            width: 80.0,
-            child: Text(
-              '$formattedDate',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
+          );
+        }
+
+        log['action'] == true ? status = 'On' : status = 'Off';
+
+        log['device'] == 'Exhaust fan'
+            ? icon = FontAwesomeIcons.fan
+            : log['device'] == 'Growth light'
+                ? icon = FontAwesomeIcons.solidLightbulb
+                : icon = FontAwesomeIcons.handHoldingWater;
+
+        var date = DateTime.fromMillisecondsSinceEpoch(log['timestamp'] * -1);
+        var formattedDate = DateFormat('dd/MM/yyyy KK:mm a')
+            .format(date); //DateFormat.yMMMEd().add_jm().format(date);
+
+        return Card(
+          child: ListTileTheme(
+            child: ListTile(
+              leading: Icon(
+                icon,
+                size: 40.0,
+                color: Colors.white,
               ),
+              title: Text(
+                '${log['device']} turns $status',
+                style: TextStyle(
+                  color: log['action'] == true ? Colors.green : Colors.red,
+                ),
+              ),
+              subtitle: Text('${log['device']} has been turned $status'),
+              trailing: Container(
+                width: 80.0,
+                child: Text(
+                  '$formattedDate',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              isThreeLine: true,
             ),
           ),
-          isThreeLine: true,
-        ),
-      ),
+        );
+      },
+    );
+  }
+}
+
+class WarningLog extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return FirebaseAnimatedList(
+      query: _warningRef,
+      itemBuilder: (BuildContext context, DataSnapshot snapshot,
+          Animation<double> animation, int index) {
+        Map log = snapshot.value;
+        if (log == null) {
+          return Center(
+            child: CircularProgressIndicator(
+              backgroundColor: Colors.lightBlueAccent,
+            ),
+          );
+        }
+
+        IconData icon;
+        log['type'] == 'temperature'
+            ? icon = FontAwesomeIcons.temperatureHigh
+            : log['type'] == 'humidity'
+                ? icon = FontAwesomeIcons.wind
+                : log['type'] == 'light intensity'
+                    ? icon = FontAwesomeIcons.lightbulb
+                    : icon = FontAwesomeIcons.leaf;
+
+        String level = log['type'] == 'temperature' ? 'High' : 'Low';
+
+        String device = log['type'] == 'temperature'
+            ? 'exhaust fan'
+            : log['type'] == 'humidity'
+                ? 'exhaust fan'
+                : log['type'] == 'light intensity'
+                    ? 'growth light'
+                    : 'water pump';
+
+        // var date = DateTime.fromMillisecondsSinceEpoch(log['timestamp'] * -1);
+        // var formattedDate = DateFormat('dd/MM/yyyy KK:mm a')
+        //     .format(date); //DateFormat.yMMMEd().add_jm().format(date);
+
+        return Card(
+          child: ListTileTheme(
+            child: ListTile(
+              leading: Icon(
+                icon,
+                size: 40.0,
+                color: Colors.white,
+              ),
+              title: Text(
+                '$level ${log['type']}',
+                style: TextStyle(
+                  color: Colors.red,
+                ),
+              ),
+              subtitle: Text(
+                  'Your plant ${log['type']} is ${level.toLowerCase()}. Activating $device'),
+              trailing: Container(
+                width: 80.0,
+                child: Text(
+                  '${log['timestamp']}',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              isThreeLine: true,
+            ),
+          ),
+        );
+      },
     );
   }
 }
