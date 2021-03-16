@@ -25,8 +25,8 @@ class _ControlState extends State<Control> {
     getDeviceStatus();
   }
 
-  bool _fanStatus = true;
-  bool _lightStatus = false;
+  bool _fanStatus;
+  bool _lightStatus;
   bool _pumpStatus;
 
   bool _deviceStatus;
@@ -181,7 +181,7 @@ class _ControlState extends State<Control> {
     await dbRef.child('log').child('actionlog').push().set({
       'action': newStatus,
       'device': deviceName,
-      'timestamp': DateTime.now().millisecondsSinceEpoch,
+      'timestamp': DateTime.now().millisecondsSinceEpoch * -1,
     });
   }
 }

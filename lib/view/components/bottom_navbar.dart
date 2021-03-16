@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:smart_indoor_garden_monitoring/view/control.dart';
+import 'package:smart_indoor_garden_monitoring/view/log.dart';
+import 'package:smart_indoor_garden_monitoring/view/plant_care.dart';
+import 'package:smart_indoor_garden_monitoring/view/report.dart';
 
 class BottomNavBar extends StatefulWidget {
   final int selectedIndex;
@@ -44,22 +48,31 @@ class _BottomNavBarState extends State<BottomNavBar> {
         onTap: (index) {
           switch (index) {
             case 0:
-              Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
+              Navigator.pushNamedAndRemoveUntil(
+                  context, '/home', (Route<dynamic> route) => false);
               break;
             case 1:
-              Navigator.pushNamedAndRemoveUntil(
-                  context, '/plantCare', (_) => false);
+              // Navigator.pushNamedAndRemoveUntil(
+              //     context, '/plantCare', (Route<dynamic> route) => false);
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => PlantCare()));
               break;
             case 2:
-              Navigator.pushNamedAndRemoveUntil(
-                  context, '/control', (_) => false);
+              // Navigator.pushNamedAndRemoveUntil(
+              //     context, '/control', (Route<dynamic> route) => false);
+              Navigator.pushReplacement(
+                  context, MaterialPageRoute(builder: (context) => Control()));
               break;
             case 3:
-              Navigator.pushNamedAndRemoveUntil(context, '/log', (_) => false);
+              // Navigator.pushNamedAndRemoveUntil(context, '/log', (_) => false);
+              Navigator.pushReplacement(
+                  context, MaterialPageRoute(builder: (context) => Log()));
               break;
             case 4:
-              Navigator.pushNamedAndRemoveUntil(
-                  context, '/report', (_) => false);
+              // Navigator.pushNamedAndRemoveUntil(
+              //     context, '/report', (Route<dynamic> route) => false);
+              Navigator.pushReplacement(
+                  context, MaterialPageRoute(builder: (context) => Report()));
               break;
             default:
           }

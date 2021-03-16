@@ -7,19 +7,18 @@ import 'package:smart_indoor_garden_monitoring/view/components/exit_dialog.dart'
 import 'package:smart_indoor_garden_monitoring/view/components/home_content.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/reusable_card.dart';
 
+final dbRef = FirebaseDatabase.instance.reference();
+var tempValue;
+var humidValue;
+var lightValue;
+var moistureValue;
+
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-  final dbRef = FirebaseDatabase.instance.reference();
-
-  var tempValue;
-  var humidValue;
-  var lightValue;
-  var moistureValue;
-
   @override
   void initState() {
     // TODO: implement initState
@@ -129,36 +128,29 @@ class _HomeState extends State<Home> {
   //   });
   // }
 
-  readData() {
-    dbRef.child('sensors').onValue.listen((event) async {
-      var snapshot = event.snapshot;
+}
 
-      tempValue = await snapshot.value['tempSensor']['value'];
-      humidValue = await snapshot.value['humidSensor']['value'];
-      lightValue = await snapshot.value['lightSensor']['value'];
-      moistureValue = await snapshot.value['soilSensor']['value'];
-      //print('Value is $tempValue');
-    });
-  }
+readData() {
+  dbRef.child('sensors').onValue.listen((event) async {
+    var snapshot = event.snapshot;
 
-  // Future<bool> _onBackPressed() {
-  //   return showDialog(
-  //     context: context,
-  //     builder: (context) => new AlertDialog(
-  //       title: new Text('Are you sure?'),
-  //       content: new Text('Do you want to exit an App'),
-  //       actions: <Widget>[
-  //         new GestureDetector(
-  //           onTap: () => Navigator.of(context).pop(false),
-  //           child: Text("NO"),
-  //         ),
-  //         SizedBox(height: 16),
-  //         new GestureDetector(
-  //           onTap: () => Navigator.of(context).pop(true),
-  //           child: Text("YES"),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+    tempValue = await snapshot.value['tempSensor']['value'];
+    humidValue = await snapshot.value['humidSensor']['value'];
+    lightValue = await snapshot.value['lightSensor']['value'];
+    moistureValue = await snapshot.value['soilSensor']['value'];
+    //print('Value is $tempValue');
+
+    //if (tempValue >= 40.0) addWarningLog('temperature', tempValue);
+    // if (humidValue <= 40.0) addWarningLog('humidity', tempValue);
+    //  if (lightValue >= 70.0) addWarningLog('light', tempValue);
+    //   if (moistureValue <= 20.0) addWarningLog('moisture', tempValue);
+  });
+}
+
+void addWarningLog(type, value) async {
+  await dbRef.child('log').child('warninglog').push().set({
+    'value': value,
+    'type': type,
+    'timestamp': DateTime.now().millisecondsSinceEpoch * -1,
+  });
 }

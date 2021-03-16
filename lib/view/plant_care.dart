@@ -26,12 +26,12 @@ class _PlantCareState extends State<PlantCare> {
     readData();
   }
 
-  double _lightMinVal;
-  double _soilMinVal;
-  double _tempMinVal;
-  double _humidMinVal;
+  var _lightMinVal;
+  var _soilMinVal;
+  var _tempMinVal;
+  var _humidMinVal;
 
-  double _sensorValue;
+  var _sensorValue;
 
   @override
   Widget build(BuildContext context) {
