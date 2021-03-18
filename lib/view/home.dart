@@ -52,7 +52,9 @@ class _HomeState extends State<Home> {
                             color: kActiveCardColor,
                             cardChild: HomeContent(
                               label: 'light intensity',
-                              value: lightValue.toString(),
+                              value: lightValue > 100
+                                  ? '0'
+                                  : lightValue.toString(),
                             ),
                           ),
                         ),
@@ -61,7 +63,9 @@ class _HomeState extends State<Home> {
                             color: kActiveCardColor,
                             cardChild: HomeContent(
                               label: 'soil moisture',
-                              value: moistureValue.toString(),
+                              value: moistureValue > 100
+                                  ? '0'
+                                  : moistureValue.toString(),
                             ),
                           ),
                         ),
@@ -77,7 +81,8 @@ class _HomeState extends State<Home> {
                             color: kActiveCardColor,
                             cardChild: HomeContent(
                               label: 'air temperature',
-                              value: tempValue.toString(),
+                              value:
+                                  tempValue > 100 ? '0' : tempValue.toString(),
                             ),
                           ),
                         ),
@@ -86,7 +91,9 @@ class _HomeState extends State<Home> {
                             color: kActiveCardColor,
                             cardChild: HomeContent(
                               label: 'air humidity',
-                              value: humidValue.toString(),
+                              value: humidValue > 100
+                                  ? '0'
+                                  : humidValue.toString(),
                             ),
                           ),
                         ),
@@ -147,10 +154,10 @@ readData() {
   });
 }
 
-void addWarningLog(type, value) async {
-  await dbRef.child('log').child('warninglog').push().set({
-    'value': value,
-    'type': type,
-    'timestamp': DateTime.now().millisecondsSinceEpoch * -1,
-  });
-}
+// void addWarningLog(type, value) async {
+//   await dbRef.child('log').child('warninglog').push().set({
+//     'value': value,
+//     'type': type,
+//     'timestamp': DateTime.now().millisecondsSinceEpoch * -1,
+//   });
+// }

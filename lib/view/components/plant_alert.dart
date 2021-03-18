@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class PlantAlert extends StatefulWidget {
-  final double initialSensorValue;
+  final initialSensorValue;
   final String label;
 
   PlantAlert({this.initialSensorValue, this.label});
@@ -12,6 +12,7 @@ class PlantAlert extends StatefulWidget {
 
 class _PlantAlertState extends State<PlantAlert> {
   double _sensorValue;
+  String level;
 
   void initState() {
     super.initState();
@@ -20,14 +21,16 @@ class _PlantAlertState extends State<PlantAlert> {
 
   @override
   Widget build(BuildContext context) {
+    level = widget.label == 'Air Temperature' ? 'maximum' : 'minimum';
+
     return AlertDialog(
-      title: Text('Set Minimum ${widget.label}'),
+      title: Text('Set $level ${widget.label}'),
       content: SingleChildScrollView(
         child: ListBody(
           children: <Widget>[
-            Text('Current minimum value: ' +
+            Text('Current $level value: ' +
                 widget.initialSensorValue.toStringAsFixed(2)),
-            Text('Set minimum value: ${_sensorValue.toStringAsFixed(2)}'),
+            Text('Set $level value: ${_sensorValue.toStringAsFixed(2)}'),
             SizedBox(
               height: 10.0,
             ),

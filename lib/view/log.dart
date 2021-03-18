@@ -245,9 +245,10 @@ class WarningLog extends StatelessWidget {
                     ? 'growth light'
                     : 'water pump';
 
-        // var date = DateTime.fromMillisecondsSinceEpoch(log['timestamp'] * -1);
-        // var formattedDate = DateFormat('dd/MM/yyyy KK:mm a')
-        //     .format(date); //DateFormat.yMMMEd().add_jm().format(date);
+        var date =
+            DateTime.fromMillisecondsSinceEpoch(log['timestamp'] * -1000);
+        var formattedDate = DateFormat('dd/MM/yyyy KK:mm a')
+            .format(date); //DateFormat.yMMMEd().add_jm().format(date);
 
         return Card(
           child: ListTileTheme(
@@ -268,7 +269,7 @@ class WarningLog extends StatelessWidget {
               trailing: Container(
                 width: 80.0,
                 child: Text(
-                  '${log['timestamp']}',
+                  '$formattedDate',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),

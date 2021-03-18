@@ -182,7 +182,7 @@ class _PlantCareState extends State<PlantCare> {
           updateMinValue('soilSensor', _soilMinVal, 'minMoisture');
         } else if (selectedSensor == Sensor.temperature) {
           _tempMinVal = double.parse((_sensorValue).toStringAsFixed(2));
-          updateMinValue('tempSensor', _tempMinVal, 'minTemp');
+          updateMinValue('tempSensor', _tempMinVal, 'maxTemp');
           //_tempMinVal = _sensorValue;
         } else {
           _humidMinVal = double.parse((_sensorValue).toStringAsFixed(2));
@@ -196,7 +196,7 @@ class _PlantCareState extends State<PlantCare> {
     dbRef.child('sensors').onValue.listen((event) async {
       var snapshot = event.snapshot;
 
-      _tempMinVal = await snapshot.value['tempSensor']['minTemp'];
+      _tempMinVal = await snapshot.value['tempSensor']['maxTemp'];
       _humidMinVal = await snapshot.value['humidSensor']['minHumidity'];
       _lightMinVal = await snapshot.value['lightSensor']['minLight'];
       _soilMinVal = await snapshot.value['soilSensor']['minMoisture'];
