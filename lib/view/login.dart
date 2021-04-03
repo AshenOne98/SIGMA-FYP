@@ -1,6 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:smart_indoor_garden_monitoring/controller/auth.dart';
 import 'package:smart_indoor_garden_monitoring/shared/constants.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/rounded_button.dart';
 
@@ -10,18 +11,18 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  String email;
-  String password;
+  String _email;
+  String _password;
   String error = '';
-  bool showSpinner = false;
-  final _auth = FirebaseAuth.instance;
+  bool _showSpinner = false;
+  //final _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFF1F2025),
       body: ModalProgressHUD(
-        inAsyncCall: showSpinner,
+        inAsyncCall: _showSpinner,
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
@@ -48,7 +49,7 @@ class _LoginState extends State<Login> {
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white),
                 onChanged: (value) {
-                  email = value;
+                  _email = value;
                 },
                 decoration:
                     kTextFieldDecoration.copyWith(hintText: 'Enter your email'),
@@ -61,7 +62,7 @@ class _LoginState extends State<Login> {
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white),
                 onChanged: (value) {
-                  password = value;
+                  _password = value;
                 },
                 decoration: kTextFieldDecoration.copyWith(
                   hintText: 'Enter your password.',
@@ -84,27 +85,42 @@ class _LoginState extends State<Login> {
                 title: 'Log In',
                 onPressed: () async {
                   setState(() {
-                    showSpinner = true;
+                    _showSpinner = true;
                   });
-                  try {
-                    final user = await _auth.signInWithEmailAndPassword(
-                        email: email, password: password);
+                  bool result = await signIn(_email, _password);
 
-                    if (user != null) {
-                      //Navigator.pushNamed(context, '/home');
-                      Navigator.pushNamedAndRemoveUntil(
-                          context, '/home', (_) => false);
-                    }
+                  if (result) {
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, '/home', (_) => false);
                     setState(() {
-                      showSpinner = false;
+                      _showSpinner = false;
                     });
-                  } catch (e) {
-                    print(e.toString());
+                  } else {
                     setState(() {
                       error = 'Could not sign in with those credentials ';
-                      showSpinner = false;
+                      _showSpinner = false;
                     });
                   }
+
+                  // try {
+                  //   final user = await _auth.signInWithEmailAndPassword(
+                  //       email: email, password: password);
+
+                  //   if (user != null) {
+                  //     //Navigator.pushNamed(context, '/home');
+                  //     Navigator.pushNamedAndRemoveUntil(
+                  //         context, '/home', (_) => false);
+                  //   }
+                  //   setState(() {
+                  //     showSpinner = false;
+                  //   });
+                  // } catch (e) {
+                  //   print(e.toString());
+                  //   setState(() {
+                  //     error = 'Could not sign in with those credentials ';
+                  //     showSpinner = false;
+                  //   });
+                  // }
                 },
               ),
             ],

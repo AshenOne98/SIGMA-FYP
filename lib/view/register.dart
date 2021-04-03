@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:smart_indoor_garden_monitoring/controller/auth.dart';
 import 'package:smart_indoor_garden_monitoring/shared/constants.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/rounded_button.dart';
 
@@ -10,13 +11,13 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  String email;
-  String password;
+  String _email;
+  String _password;
   String error = '';
   bool validate;
   bool showSpinner = false;
 
-  final _auth = FirebaseAuth.instance;
+  //final _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,7 +50,7 @@ class _RegisterState extends State<Register> {
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white),
                 onChanged: (value) {
-                  email = value;
+                  _email = value;
                 },
                 decoration: kTextFieldDecoration.copyWith(
                   hintText: 'Enter your email',
@@ -63,7 +64,7 @@ class _RegisterState extends State<Register> {
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white),
                 onChanged: (value) {
-                  password = value;
+                  _password = value;
                 },
                 decoration: kTextFieldDecoration.copyWith(
                   hintText: 'Enter your password',
@@ -88,24 +89,24 @@ class _RegisterState extends State<Register> {
                   setState(() {
                     showSpinner = true;
                   });
-                  print(email);
-                  print(password);
-                  try {
-                    final newUser = await _auth.createUserWithEmailAndPassword(
-                        email: email, password: password);
+                  print(_email);
+                  print(_password);
 
-                    if (newUser != null) {
-                      //Navigator.pushNamed(context, '/home');
-                      Navigator.pushNamedAndRemoveUntil(
-                          context, '/home', (_) => false);
-                    }
+                  dynamic result = await register(_email, _password);
+
+                  if (result == true) {
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, '/home', (_) => false);
                     setState(() {
                       showSpinner = false;
                     });
-                  } catch (e) {
-                    print(e.toString());
+                  } else {
                     setState(() {
-                      error = 'Please supply a valid email or password';
+                      if (result == null) {
+                        error = 'Please supply a valid email or password';
+                      } else {
+                        error = result;
+                      }
                       showSpinner = false;
                     });
                   }

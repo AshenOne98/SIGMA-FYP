@@ -154,6 +154,11 @@ class ActionLog extends StatelessWidget {
     IconData icon;
     return FirebaseAnimatedList(
       query: _actionRef,
+      defaultChild: Center(
+        child: CircularProgressIndicator(
+          backgroundColor: Colors.lightBlueAccent,
+        ),
+      ),
       itemBuilder: (BuildContext context, DataSnapshot snapshot,
           Animation<double> animation, int index) {
         Map log = snapshot.value;
@@ -162,6 +167,10 @@ class ActionLog extends StatelessWidget {
             child: CircularProgressIndicator(
               backgroundColor: Colors.lightBlueAccent,
             ),
+          );
+        } else if (log.isEmpty) {
+          return Center(
+            child: Text('There is no action log'),
           );
         }
 
@@ -215,6 +224,11 @@ class WarningLog extends StatelessWidget {
   Widget build(BuildContext context) {
     return FirebaseAnimatedList(
       query: _warningRef,
+      defaultChild: Center(
+        child: CircularProgressIndicator(
+          backgroundColor: Colors.lightBlueAccent,
+        ),
+      ),
       itemBuilder: (BuildContext context, DataSnapshot snapshot,
           Animation<double> animation, int index) {
         Map log = snapshot.value;
@@ -223,6 +237,10 @@ class WarningLog extends StatelessWidget {
             child: CircularProgressIndicator(
               backgroundColor: Colors.lightBlueAccent,
             ),
+          );
+        } else if (_warningRef == null) {
+          return Center(
+            child: Text('There is no warning log'),
           );
         }
 

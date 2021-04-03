@@ -124,17 +124,6 @@ class _HomeState extends State<Home> {
       ),
     );
   }
-
-  // readData() {
-  //   dbRef.child("SIGMA").once().then((DataSnapshot snapshot) async {
-  //     print(snapshot.value['temperature']);
-  //     tempValue = await snapshot.value['temperature:'];
-  //     // setState(() {
-  //     //   value = snapshot.value['temperature'];
-  //     // });
-  //   });
-  // }
-
 }
 
 readData() {
@@ -146,18 +135,5 @@ readData() {
     lightValue = await snapshot.value['lightSensor']['value'];
     moistureValue = await snapshot.value['soilSensor']['value'];
     //print('Value is $tempValue');
-
-    //if (tempValue >= 40.0) addWarningLog('temperature', tempValue);
-    // if (humidValue <= 40.0) addWarningLog('humidity', tempValue);
-    //  if (lightValue >= 70.0) addWarningLog('light', tempValue);
-    //   if (moistureValue <= 20.0) addWarningLog('moisture', tempValue);
   });
 }
-
-// void addWarningLog(type, value) async {
-//   await dbRef.child('log').child('warninglog').push().set({
-//     'value': value,
-//     'type': type,
-//     'timestamp': DateTime.now().millisecondsSinceEpoch * -1,
-//   });
-// }
