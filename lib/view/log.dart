@@ -125,26 +125,6 @@ class _LogState extends State<Log> {
       ),
     );
   }
-
-  // readData() {
-  //   dbRef.child('log').child("actionlog").onValue.listen((event) async {
-  //     var snapshot = event.snapshot;
-
-  //     status = await snapshot.value['-MVWjhVyQDV0R8l_tDl6']['action'];
-  //     device = await snapshot.value['-MVWjhVyQDV0R8l_tDl6']['device'];
-  //     timestamp = await snapshot.value['-MVWjhVyQDV0R8l_tDl6']['timestamp'];
-
-  //     print(status);
-
-  //     //int count = snapshot.value.length;
-  //     //print(snapshot.value);
-
-  //     // var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-  //     // var formattedDate = DateFormat.yMd().add_jm().format(date);
-  //     // datetime = formattedDate;
-  //     // print(formattedDate);
-  //   });
-  // }
 }
 
 class ActionLog extends StatelessWidget {

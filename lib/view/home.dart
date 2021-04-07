@@ -113,10 +113,37 @@ class _HomeState extends State<Home> {
                 ],
               );
             } else {
-              return Center(
-                child: CircularProgressIndicator(
-                  backgroundColor: Colors.lightBlueAccent,
-                ),
+              return Column(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        backgroundColor: Colors.lightBlueAccent,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 20.0,
+                          width: MediaQuery.of(context).size.width / 1.1,
+                          child: Divider(
+                            color: Colors.white,
+                          ),
+                        ),
+                        BottomNavBar(
+                          selectedIndex: 0,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               );
             }
           },
@@ -127,13 +154,20 @@ class _HomeState extends State<Home> {
 }
 
 readData() {
-  dbRef.child('sensors').onValue.listen((event) async {
-    var snapshot = event.snapshot;
+  try {
+    dbRef.child('sensors').onValue.listen((event) async {
+      var snapshot = event.snapshot;
 
-    tempValue = await snapshot.value['tempSensor']['value'];
-    humidValue = await snapshot.value['humidSensor']['value'];
-    lightValue = await snapshot.value['lightSensor']['value'];
-    moistureValue = await snapshot.value['soilSensor']['value'];
-    //print('Value is $tempValue');
-  });
+      tempValue = await snapshot.value['tempSensor']['value'];
+      humidValue = await snapshot.value['humidSensor']['value'];
+      lightValue = await snapshot.value['lightSensor']['value'];
+      moistureValue = await snapshot.value['soilSensor']['value'];
+      //print('Value is $tempValue');
+    });
+  } catch (e) {
+    tempValue = 0;
+    humidValue = 0;
+    lightValue = 0;
+    moistureValue = 0;
+  }
 }
