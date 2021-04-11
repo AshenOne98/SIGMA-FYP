@@ -2,14 +2,13 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:intl/intl.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:smart_indoor_garden_monitoring/shared/constants.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/appbar_content.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/bottom_navbar.dart';
 import 'package:smart_indoor_garden_monitoring/view/components/exit_dialog.dart';
 
 enum ReportType { sensor, device }
-Query dataTemp, dataHumid;
+Query dataTemp, dataHumid, dataLight, dataMoisture;
 
 class Report extends StatefulWidget {
   @override
@@ -18,20 +17,6 @@ class Report extends StatefulWidget {
 
 class _ReportState extends State<Report> {
   ReportType reports;
-  // bool isLoading = false;
-  // num _stackToView = 1;
-  // List<charts.Series<ChartData, dynamic>> _seriesList;
-  // List<ChartData> chartData;
-
-  // _generateData(chartData) {
-  //   _seriesList = List<charts.Series<ChartData, String>>();
-  //   _seriesList.add(charts.Series(
-  //     domainFn: (ChartData data, _) => data.xValue,
-  //     measureFn: (ChartData data, _) => data.yValue,
-  //     id: "Temp Redings",
-  //     data: chartData,
-  //   ));
-  // }
 
   @override
   void initState() {
@@ -46,6 +31,16 @@ class _ReportState extends State<Report> {
         .reference()
         .child("readings")
         .child("humidReadings");
+
+    dataLight = FirebaseDatabase.instance
+        .reference()
+        .child("readings")
+        .child("lightReadings");
+
+    dataMoisture = FirebaseDatabase.instance
+        .reference()
+        .child("readings")
+        .child("soilReadings");
 
     reports = ReportType.sensor;
   }
@@ -113,7 +108,7 @@ class _ReportState extends State<Report> {
               child: SingleChildScrollView(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height * 1.2),
+                      maxHeight: MediaQuery.of(context).size.height * 2.3),
                   child: Column(
                     children: [
                       GraphReading(
@@ -123,6 +118,14 @@ class _ReportState extends State<Report> {
                       GraphReading(
                         query: dataHumid,
                         label: "Humidity",
+                      ),
+                      GraphReading(
+                        query: dataLight,
+                        label: "Light",
+                      ),
+                      GraphReading(
+                        query: dataMoisture,
+                        label: "Moisture",
                       ),
                     ],
                   ),
@@ -159,7 +162,7 @@ class GraphReading extends StatelessWidget {
           stream: query.onValue,
           builder: (BuildContext context, AsyncSnapshot<Event> snap) {
             if (snap.hasData) {
-              List<TempData> tempData = <TempData>[];
+              List<ChartData> chartData = <ChartData>[];
               Map data = snap.data.snapshot.value;
               Map sorted = Map.fromEntries(
                 data.entries.toList()
@@ -170,19 +173,12 @@ class GraphReading extends StatelessWidget {
               );
 
               for (Map childData in sorted.values) {
-                tempData.add(
-                  TempData.fromMap(
+                chartData.add(
+                  ChartData.fromMap(
                     childData.cast<String, dynamic>(),
                   ),
                 );
               }
-
-              // List<ChartData> data = snap.data.snapshot.value
-              //     .map((snapshot) => ChartData.fromMap(snapshot.data))
-              //     .toList();
-              // print(chartData);
-              // chartData = data;
-              // _generateData(chartData);
 
               return Padding(
                 padding: EdgeInsets.all(10.0),
@@ -197,22 +193,24 @@ class GraphReading extends StatelessWidget {
                           ),
                           Container(
                             child: SfCartesianChart(
+                              enableAxisAnimation: true,
                               primaryXAxis: DateTimeAxis(
                                 dateFormat: DateFormat.Hm(),
                                 intervalType: DateTimeIntervalType.minutes,
-                                interval: 10,
+                                interval: 5,
                               ),
-                              series: <ChartSeries<TempData, dynamic>>[
-                                LineSeries<TempData, dynamic>(
-                                  //markerSettings: MarkerSettings(isVisible: true),
-                                  dataSource: tempData,
-                                  xValueMapper: (TempData data, _) =>
+                              series: <ChartSeries<ChartData, dynamic>>[
+                                LineSeries<ChartData, dynamic>(
+                                  // markerSettings:
+                                  //     MarkerSettings(isVisible: true),
+                                  dataSource: chartData,
+                                  xValueMapper: (ChartData data, _) =>
                                       data.xValue,
-                                  yValueMapper: (TempData data, _) =>
+                                  yValueMapper: (ChartData data, _) =>
                                       data.yValue,
                                   dataLabelSettings: DataLabelSettings(
                                       // Renders the data label
-                                      //isVisible: true,
+                                      // isVisible: true,
                                       ),
                                 ),
                               ],
@@ -224,13 +222,12 @@ class GraphReading extends StatelessWidget {
                   ],
                 ),
               );
-              //     charts.LineChart(
-              //   _seriesList,
-              //   animate: true,
-              //   animationDuration: Duration(seconds: 5),
-              // );
-
-              // Container();
+            } else if (snap.hasData == null) {
+              return Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.lightBlueAccent,
+                ),
+              );
             } else {
               return Center(
                 child: CircularProgressIndicator(
@@ -245,19 +242,9 @@ class GraphReading extends StatelessWidget {
   }
 }
 
-class TempData {
-  TempData({this.xValue, this.yValue});
-  TempData.fromMap(Map<String, dynamic> dataMap)
-      : xValue =
-            DateTime.fromMillisecondsSinceEpoch(dataMap['timestamp'] * -1000),
-        yValue = ((dataMap['value'] as num) * 100).truncateToDouble() / 100;
-  final xValue;
-  final yValue;
-}
-
-class HumidData {
-  HumidData({this.xValue, this.yValue});
-  HumidData.fromMap(Map<String, dynamic> dataMap)
+class ChartData {
+  ChartData({this.xValue, this.yValue});
+  ChartData.fromMap(Map<String, dynamic> dataMap)
       : xValue =
             DateTime.fromMillisecondsSinceEpoch(dataMap['timestamp'] * -1000),
         yValue = ((dataMap['value'] as num) * 100).truncateToDouble() / 100;
