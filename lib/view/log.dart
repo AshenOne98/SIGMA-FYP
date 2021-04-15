@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:smart_indoor_garden_monitoring/shared/constants.dart';
@@ -9,11 +10,16 @@ import 'package:smart_indoor_garden_monitoring/view/components/bottom_navbar.dar
 import 'package:smart_indoor_garden_monitoring/view/components/exit_dialog.dart';
 
 enum LogType { warning, action }
+enum WarningType { humid, temp, light, moisture }
+enum ActionType { growthLight, exhaustFan, waterPump }
 final dbRef = FirebaseDatabase.instance.reference();
+var _selection;
+String selectedWarning, selectedAction;
+Key _key;
 
-var status;
-var device;
-var timestamp;
+// var status;
+// var device;
+// var timestamp;
 
 Query _actionRef, _warningRef;
 
@@ -24,22 +30,29 @@ class Log extends StatefulWidget {
 
 class _LogState extends State<Log> {
   LogType logs;
+  WarningType warnings;
 
   @override
   void initState() {
     super.initState();
     logs = LogType.warning;
+    selectedWarning = '';
+    selectedAction = '';
+
     _actionRef = FirebaseDatabase.instance
         .reference()
         .child('log')
         .child("actionlog")
-        .orderByChild('timestamp');
+        .orderByChild('timestamp')
+        .limitToFirst(100);
 
     _warningRef = FirebaseDatabase.instance
         .reference()
         .child('log')
         .child("warninglog")
-        .orderByChild('timestamp');
+        .orderByChild('timestamp')
+        .limitToFirst(100);
+
     //readData();
   }
 
@@ -122,6 +135,99 @@ class _LogState extends State<Log> {
             ),
           ],
         ),
+        floatingActionButton: Padding(
+          padding: EdgeInsets.only(bottom: 70.0),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Color(0xFFFFA800),
+              borderRadius: BorderRadius.all(
+                Radius.circular(50),
+              ),
+            ),
+            height: 50.0,
+            width: 50.0,
+            child: logs == LogType.warning ? popMenuWarning() : popMenuAction(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  PopupMenuButton<WarningType> popMenuWarning() {
+    return PopupMenuButton<WarningType>(
+      onSelected: (WarningType result) {
+        setState(() {
+          _selection = result;
+          print(_selection);
+
+          if (_selection == WarningType.humid) selectedWarning = "humidity";
+          if (_selection == WarningType.moisture)
+            selectedWarning = "soil moisture";
+          if (_selection == WarningType.temp) selectedWarning = "temperature";
+          if (_selection == WarningType.light)
+            selectedWarning = "light intensity";
+
+          _key = Key(selectedWarning.toString());
+        });
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<WarningType>>[
+        const PopupMenuItem<WarningType>(
+          value: WarningType.temp,
+          child: Text('Temperature'),
+        ),
+        const PopupMenuItem<WarningType>(
+          value: WarningType.humid,
+          child: Text('Humidity'),
+        ),
+        const PopupMenuItem<WarningType>(
+          value: WarningType.moisture,
+          child: Text('Moisture'),
+        ),
+        const PopupMenuItem<WarningType>(
+          value: WarningType.light,
+          child: Text('Light'),
+        ),
+      ],
+      child: Icon(
+        Icons.menu,
+        color: Colors.black,
+      ),
+    );
+  }
+
+  PopupMenuButton<ActionType> popMenuAction() {
+    return PopupMenuButton<ActionType>(
+      onSelected: (ActionType result) {
+        setState(() {
+          _selection = result;
+          print(_selection);
+
+          if (_selection == ActionType.exhaustFan)
+            selectedAction = 'Exhaust fan';
+          if (_selection == ActionType.growthLight)
+            selectedAction = 'Growth light';
+          if (_selection == ActionType.waterPump) selectedAction = 'Water pump';
+
+          _key = Key(selectedAction.toString());
+        });
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<ActionType>>[
+        const PopupMenuItem<ActionType>(
+          value: ActionType.exhaustFan,
+          child: Text('Exhaust Fan'),
+        ),
+        const PopupMenuItem<ActionType>(
+          value: ActionType.waterPump,
+          child: Text('Water Pump'),
+        ),
+        const PopupMenuItem<ActionType>(
+          value: ActionType.growthLight,
+          child: Text('Light'),
+        ),
+      ],
+      child: Icon(
+        Icons.menu,
+        color: Colors.black,
       ),
     );
   }
@@ -142,6 +248,7 @@ class ActionLog extends StatelessWidget {
       itemBuilder: (BuildContext context, DataSnapshot snapshot,
           Animation<double> animation, int index) {
         Map log = snapshot.value;
+
         if (log == null) {
           return Center(
             child: CircularProgressIndicator(
@@ -166,35 +273,75 @@ class ActionLog extends StatelessWidget {
         var formattedDate = DateFormat('dd/MM/yyyy KK:mm a')
             .format(date); //DateFormat.yMMMEd().add_jm().format(date);
 
-        return Card(
-          child: ListTileTheme(
-            child: ListTile(
-              leading: Icon(
-                icon,
-                size: 40.0,
-                color: Colors.white,
-              ),
-              title: Text(
-                '${log['device']} turns $status',
-                style: TextStyle(
-                  color: log['action'] == true ? Colors.green : Colors.red,
-                ),
-              ),
-              subtitle: Text('${log['device']} has been turned $status'),
-              trailing: Container(
-                width: 80.0,
-                child: Text(
-                  '$formattedDate',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              isThreeLine: true,
+        if (selectedAction == null || selectedAction == '') {
+          return ActionCard(
+            icon: icon,
+            log: log,
+            status: status,
+            formattedDate: formattedDate,
+          );
+        } else if (log['device'] == '$selectedAction') {
+          return ActionCard(
+            icon: icon,
+            log: log,
+            status: status,
+            formattedDate: formattedDate,
+          );
+        } else if (log['device'] != '$selectedAction' &&
+            selectedAction != null) {
+          print("bottom");
+          return SizedBox(height: 0);
+        } else {
+          return SizedBox(height: 0);
+        }
+      },
+    );
+  }
+}
+
+class ActionCard extends StatelessWidget {
+  const ActionCard({
+    Key key,
+    @required this.icon,
+    @required this.log,
+    @required this.status,
+    @required this.formattedDate,
+  }) : super(key: key);
+
+  final IconData icon;
+  final Map log;
+  final status;
+  final String formattedDate;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: ListTileTheme(
+        child: ListTile(
+          leading: Icon(
+            icon,
+            size: 40.0,
+            color: Colors.white,
+          ),
+          title: Text(
+            '${log['device']} turns $status',
+            style: TextStyle(
+              color: log['action'] == true ? Colors.green : Colors.red,
             ),
           ),
-        );
-      },
+          subtitle: Text('${log['device']} has been turned $status'),
+          trailing: Container(
+            width: 80.0,
+            child: Text(
+              '$formattedDate',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          isThreeLine: true,
+        ),
+      ),
     );
   }
 }
@@ -203,6 +350,7 @@ class WarningLog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FirebaseAnimatedList(
+      // key: _key,
       query: _warningRef,
       defaultChild: Center(
         child: CircularProgressIndicator(
@@ -212,6 +360,7 @@ class WarningLog extends StatelessWidget {
       itemBuilder: (BuildContext context, DataSnapshot snapshot,
           Animation<double> animation, int index) {
         Map log = snapshot.value;
+
         if (log == null) {
           return Center(
             child: CircularProgressIndicator(
@@ -248,36 +397,79 @@ class WarningLog extends StatelessWidget {
         var formattedDate = DateFormat('dd/MM/yyyy KK:mm a')
             .format(date); //DateFormat.yMMMEd().add_jm().format(date);
 
-        return Card(
-          child: ListTileTheme(
-            child: ListTile(
-              leading: Icon(
-                icon,
-                size: 40.0,
-                color: Colors.white,
-              ),
-              title: Text(
-                '$level ${log['type']}',
-                style: TextStyle(
-                  color: Colors.red,
-                ),
-              ),
-              subtitle: Text(
-                  'Your plant ${log['type']} is ${level.toLowerCase()}. Activating $device'),
-              trailing: Container(
-                width: 80.0,
-                child: Text(
-                  '$formattedDate',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              isThreeLine: true,
+        if (selectedWarning == null || selectedWarning == '') {
+          print("top");
+          return WarningCard(
+              icon: icon,
+              level: level,
+              log: log,
+              device: device,
+              formattedDate: formattedDate);
+        } else if (log['type'] == '$selectedWarning') {
+          print("middle");
+          return WarningCard(
+              icon: icon,
+              level: level,
+              log: log,
+              device: device,
+              formattedDate: formattedDate);
+        } else if (log['type'] != '$selectedWarning' &&
+            selectedWarning != null) {
+          print("bottom");
+          return SizedBox(height: 0);
+        } else {
+          return SizedBox(height: 0);
+        }
+      },
+    );
+  }
+}
+
+class WarningCard extends StatelessWidget {
+  const WarningCard({
+    @required this.icon,
+    @required this.level,
+    @required this.log,
+    @required this.device,
+    @required this.formattedDate,
+  });
+
+  final IconData icon;
+  final String level;
+  final Map log;
+  final String device;
+  final String formattedDate;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: ListTileTheme(
+        child: ListTile(
+          leading: Icon(
+            icon,
+            size: 40.0,
+            color: Colors.white,
+          ),
+          title: Text(
+            '$level ${log['type']}',
+            style: TextStyle(
+              color: Colors.red,
             ),
           ),
-        );
-      },
+          subtitle: Text(
+              'Your plant ${log['type']} is ${level.toLowerCase()}. Activating $device'),
+          trailing: Container(
+            width: 80.0,
+            child: Text(
+              '$formattedDate',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          isThreeLine: true,
+        ),
+      ),
     );
   }
 }
