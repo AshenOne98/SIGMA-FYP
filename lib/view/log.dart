@@ -15,7 +15,7 @@ enum ActionType { growthLight, exhaustFan, waterPump }
 final dbRef = FirebaseDatabase.instance.reference();
 var _selection;
 String selectedWarning, selectedAction;
-Key _key;
+// Key _key;
 
 // var status;
 // var device;
@@ -53,7 +53,7 @@ class _LogState extends State<Log> {
         .orderByChild('timestamp')
         .limitToFirst(100);
 
-    //readData();
+    listenChange();
   }
 
   @override
@@ -101,7 +101,7 @@ class _LogState extends State<Log> {
                       height: 50.0,
                       child: Center(
                         child: Text(
-                          'Action Log',
+                          'Device Log',
                         ),
                       ),
                     ),
@@ -167,7 +167,7 @@ class _LogState extends State<Log> {
           if (_selection == WarningType.light)
             selectedWarning = "light intensity";
 
-          _key = Key(selectedWarning.toString());
+          // _key = Key(selectedWarning.toString());
         });
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<WarningType>>[
@@ -208,7 +208,7 @@ class _LogState extends State<Log> {
             selectedAction = 'Growth light';
           if (_selection == ActionType.waterPump) selectedAction = 'Water pump';
 
-          _key = Key(selectedAction.toString());
+          // _key = Key(selectedAction.toString());
         });
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<ActionType>>[
@@ -472,4 +472,11 @@ class WarningCard extends StatelessWidget {
       ),
     );
   }
+}
+
+listenChange() {
+  var db = dbRef.child("log");
+  db.child("warningLog").onChildAdded.listen((data) {
+    print(data);
+  });
 }

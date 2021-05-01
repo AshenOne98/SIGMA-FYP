@@ -108,7 +108,8 @@ class _ReportState extends State<Report> {
               child: SingleChildScrollView(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height * 2.3),
+                      maxHeight: MediaQuery.of(context).size.height * 2.3,
+                      maxWidth: MediaQuery.of(context).size.width),
                   child: Column(
                     children: [
                       GraphReading(
@@ -210,7 +211,7 @@ class GraphReading extends StatelessWidget {
                                       data.yValue,
                                   dataLabelSettings: DataLabelSettings(
                                       // Renders the data label
-                                      // isVisible: true,
+                                      //isVisible: true,
                                       ),
                                 ),
                               ],
