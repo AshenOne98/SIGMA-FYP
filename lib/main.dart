@@ -55,8 +55,8 @@ class MyApp extends StatelessWidget {
           android: androidDetails,
           iOS: iosDetails,
         );
-        localNotifications.show(0, "Notify title", "body of notification",
-            generalNotificationDetails);
+        localNotifications.show(0, "${msg['notification']['title']}",
+            "${msg['notification']['body']}", generalNotificationDetails);
       },
     );
 
