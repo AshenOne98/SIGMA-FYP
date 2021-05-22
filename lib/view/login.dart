@@ -97,8 +97,8 @@ class _LoginState extends State<Login> {
                     });
                   } else {
                     setState(() {
-                      error = 'Could not sign in with those credentials ';
                       _showSpinner = false;
+                      error = 'Could not sign in with those credentials ';
                     });
                   }
 

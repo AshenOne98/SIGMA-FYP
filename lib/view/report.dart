@@ -10,6 +10,8 @@ import 'package:smart_indoor_garden_monitoring/view/components/exit_dialog.dart'
 enum ReportType { sensor, device }
 Query dataTemp, dataHumid, dataLight, dataMoisture, dataSensor;
 
+final String formattedDate = DateFormat.yMMMMd('en_US').format(DateTime.now());
+
 class Report extends StatefulWidget {
   @override
   _ReportState createState() => _ReportState();
@@ -26,28 +28,31 @@ class _ReportState extends State<Report> {
         .reference()
         .child("readings")
         .child("tempReadings")
-        .limitToFirst(40);
+        .limitToLast(40);
 
     dataHumid = FirebaseDatabase.instance
         .reference()
         .child("readings")
         .child("humidReadings")
-        .limitToFirst(40);
+        .limitToLast(40);
 
     dataLight = FirebaseDatabase.instance
         .reference()
         .child("readings")
         .child("lightReadings")
-        .limitToFirst(40);
+        .limitToLast(40);
 
     dataMoisture = FirebaseDatabase.instance
         .reference()
         .child("readings")
         .child("soilReadings")
-        .limitToFirst(40);
+        .limitToLast(40);
 
-    dataSensor =
-        FirebaseDatabase.instance.reference().child("log").child("sensorlog");
+    dataSensor = FirebaseDatabase.instance
+        .reference()
+        .child("log")
+        .child("sensorlog")
+        .limitToLast(1);
 
     reports = ReportType.sensor;
 
@@ -112,12 +117,19 @@ class _ReportState extends State<Report> {
                 ),
               ],
             ),
-            SizedBox(height: 17.0),
+            SizedBox(height: 25.0),
             Expanded(
               child: reports == ReportType.sensor
                   ? GraphChart()
                   : Column(
                       children: [
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Text(
+                            "The number of times the sensors disconnected with the microcontroller",
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
                         BarChart(
                           query: dataSensor,
                         ),
@@ -148,28 +160,42 @@ class GraphChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double deviceHeight = MediaQuery.of(context).size.height;
+    print(deviceHeight);
     return SingleChildScrollView(
       child: ConstrainedBox(
         constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 2.3,
-            maxWidth: MediaQuery.of(context).size.width),
+          minHeight: MediaQuery.of(context).size.height,
+          maxHeight: deviceHeight > 592.0
+              ? MediaQuery.of(context).size.height * 2.0
+              : MediaQuery.of(context).size.height * 2.3,
+          maxWidth: MediaQuery.of(context).size.width,
+        ),
         child: Column(
           children: [
-            GraphReading(
-              query: dataTemp,
-              label: "Temperature",
+            Expanded(
+              child: GraphReading(
+                query: dataTemp,
+                label: "Temperature",
+              ),
             ),
-            GraphReading(
-              query: dataHumid,
-              label: "Humidity",
+            Expanded(
+              child: GraphReading(
+                query: dataHumid,
+                label: "Humidity",
+              ),
             ),
-            GraphReading(
-              query: dataLight,
-              label: "Light",
+            Expanded(
+              child: GraphReading(
+                query: dataLight,
+                label: "Light",
+              ),
             ),
-            GraphReading(
-              query: dataMoisture,
-              label: "Moisture",
+            Expanded(
+              child: GraphReading(
+                query: dataMoisture,
+                label: "Moisture",
+              ),
             ),
           ],
         ),
@@ -182,20 +208,19 @@ class BarChart extends StatelessWidget {
   final query;
   BarChart({this.query});
 
-  final String formattedDate =
-      DateFormat.yMMMMd('en_US').format(DateTime.now());
-
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 2.3,
+        ),
         child: StreamBuilder<Event>(
           stream: query.onValue,
           builder: (BuildContext context, AsyncSnapshot<Event> snap) {
             if (snap.hasData) {
               List<BarChartData> barChartData = <BarChartData>[];
               Map data = snap.data.snapshot.value;
-              print(data['May 5 2021']['humidSensor']);
 
               for (Map childData in data.values) {
                 barChartData.add(
@@ -204,6 +229,8 @@ class BarChart extends StatelessWidget {
                   ),
                 );
               }
+
+              print(data);
               return Padding(
                 padding: EdgeInsets.all(5.0),
                 child: Column(
@@ -216,45 +243,61 @@ class BarChart extends StatelessWidget {
                             style: TextStyle(),
                           ),
                           Container(
+                            height: MediaQuery.of(context).size.height * 0.45,
                             child: SfCartesianChart(
                               enableAxisAnimation: true,
                               primaryXAxis: CategoryAxis(
                                 // labelPlacement: LabelPlacement.onTicks,
+                                // edgeLabelPlacement: EdgeLabelPlacement.hide,
+                                labelAlignment: LabelAlignment.start,
                                 labelIntersectAction:
                                     AxisLabelIntersectAction.multipleRows,
-                                rangePadding: ChartRangePadding.round,
+                                rangePadding: ChartRangePadding.auto,
                                 plotOffset: 10,
-                                interval: 1,
+
+                                // interval: 1,
+                                majorTickLines: MajorTickLines(
+                                  size: 6,
+                                  width: 0,
+                                  color: Colors.red,
+                                ),
                               ),
                               series: <ChartSeries>[
                                 // Renders column chart
                                 ColumnSeries<BarChartData, String>(
                                   width: 1,
-                                  spacing: 0.1,
                                   dataSource: barChartData,
                                   xValueMapper: (BarChartData data, _) =>
                                       data.dht11,
                                   yValueMapper: (BarChartData data, _) =>
                                       data.dht11Value,
+                                  dataLabelSettings: DataLabelSettings(
+                                      // Renders the data label
+                                      isVisible: true),
                                 ),
                                 ColumnSeries<BarChartData, String>(
                                   width: 1,
-                                  spacing: 0.1,
                                   dataSource: barChartData,
                                   xValueMapper: (BarChartData data, _) =>
                                       data.lightSensor,
                                   yValueMapper: (BarChartData data, _) =>
                                       data.lightValue,
+                                  dataLabelSettings: DataLabelSettings(
+                                      // Renders the data label
+                                      isVisible: true),
                                 ),
-                                // ColumnSeries<BarChartData, String>(
-                                //   width: 1,
-                                //   spacing: 0.1,
-                                //   dataSource: barChartData,
-                                //   xValueMapper: (BarChartData data, _) =>
-                                //       data.moistureSensor,
-                                //   yValueMapper: (BarChartData data, _) =>
-                                //       data.moistureSensorValue,
-                                // ),
+
+                                ColumnSeries<BarChartData, String>(
+                                  width: 1,
+                                  dataSource: barChartData,
+                                  xValueMapper: (BarChartData data, _) =>
+                                      data.moistureSensor,
+                                  yValueMapper: (BarChartData data, _) =>
+                                      data.moistureSensorValue,
+                                  dataLabelSettings: DataLabelSettings(
+                                      // Renders the data label
+                                      isVisible: true),
+                                ),
                               ],
                             ),
                           ),
@@ -291,87 +334,89 @@ class GraphReading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        child: StreamBuilder<Event>(
-          stream: query.onValue,
-          builder: (BuildContext context, AsyncSnapshot<Event> snap) {
-            if (snap.hasData) {
-              List<ChartData> chartData = <ChartData>[];
-              Map data = snap.data.snapshot.value;
-              Map sorted = Map.fromEntries(
-                data.entries.toList()
-                  ..sort(
-                    (e1, e2) =>
-                        e1.value["timestamp"].compareTo(e2.value["timestamp"]),
-                  ),
-              );
-
-              for (Map childData in sorted.values) {
-                chartData.add(
-                  ChartData.fromMap(
-                    childData.cast<String, dynamic>(),
-                  ),
-                );
-              }
-
-              return Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Text(
-                            "$label Readings",
-                            style: TextStyle(),
-                          ),
-                          Container(
-                            child: SfCartesianChart(
-                              enableAxisAnimation: true,
-                              primaryXAxis: DateTimeAxis(
-                                dateFormat: DateFormat.Hm(),
-                                intervalType: DateTimeIntervalType.minutes,
-                                interval: 2,
-                              ),
-                              series: <ChartSeries<ChartData, dynamic>>[
-                                LineSeries<ChartData, dynamic>(
-                                  // markerSettings:
-                                  //     MarkerSettings(isVisible: true),
-                                  dataSource: chartData,
-                                  xValueMapper: (ChartData data, _) =>
-                                      data.xValue,
-                                  yValueMapper: (ChartData data, _) =>
-                                      data.yValue,
-                                  dataLabelSettings: DataLabelSettings(
-                                      // Renders the data label
-                                      //isVisible: true,
-                                      ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+    return Container(
+      child: StreamBuilder<Event>(
+        stream: query.onValue,
+        builder: (BuildContext context, AsyncSnapshot<Event> snap) {
+          if (snap.hasData) {
+            List<ChartData> chartData = <ChartData>[];
+            Map data = snap.data.snapshot.value;
+            Map sorted = Map.fromEntries(
+              data.entries.toList()
+                ..sort(
+                  (e1, e2) =>
+                      e1.value["timestamp"].compareTo(e2.value["timestamp"]),
                 ),
-              );
-            } else if (snap.hasData == null) {
-              return Center(
-                child: CircularProgressIndicator(
-                  backgroundColor: Colors.lightBlueAccent,
-                ),
-              );
-            } else {
-              return Center(
-                child: CircularProgressIndicator(
-                  backgroundColor: Colors.lightBlueAccent,
+            );
+
+            for (Map childData in sorted.values) {
+              chartData.add(
+                ChartData.fromMap(
+                  childData.cast<String, dynamic>(),
                 ),
               );
             }
-          },
-        ),
+            return Padding(
+              padding: EdgeInsets.only(
+                top: 0.0,
+                bottom: 0.0,
+                left: 10.0,
+                right: 10.0,
+              ),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Text(
+                          "$label Readings",
+                          style: TextStyle(),
+                        ),
+                        Container(
+                          child: SfCartesianChart(
+                            enableAxisAnimation: true,
+                            primaryXAxis: DateTimeAxis(
+                              dateFormat: DateFormat.Hm(),
+                              intervalType: DateTimeIntervalType.minutes,
+                              interval: 3,
+                            ),
+                            series: <ChartSeries<ChartData, dynamic>>[
+                              LineSeries<ChartData, dynamic>(
+                                // markerSettings:
+                                //     MarkerSettings(isVisible: true),
+                                dataSource: chartData,
+                                xValueMapper: (ChartData data, _) =>
+                                    data.xValue,
+                                yValueMapper: (ChartData data, _) =>
+                                    data.yValue,
+                                dataLabelSettings: DataLabelSettings(
+                                    // Renders the data label
+                                    //isVisible: true,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          } else if (snap.hasData == null) {
+            return Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.lightBlueAccent,
+              ),
+            );
+          } else {
+            return Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.lightBlueAccent,
+              ),
+            );
+          }
+        },
       ),
     );
   }
@@ -397,11 +442,11 @@ class BarChartData {
       this.moistureSensorValue});
 
   BarChartData.fromMap(Map<String, dynamic> dataMap)
-      : dht11 = "DHT11",
+      : dht11 = "DHT11\t\t\t\t\t\t\t\t\t\t\t\t\t\t",
         dht11Value = dataMap['humidSensor'],
         lightSensor = "Light Sensor",
         lightValue = dataMap['lightSensor'],
-        moistureSensor = "Moisture Sensor",
+        moistureSensor = "\t\t\t\t\t\t\t\t\t\t\t\t\t\tMoisture Sensor",
         moistureSensorValue = dataMap['moistureSensor'];
 
   final dht11;
@@ -411,3 +456,16 @@ class BarChartData {
   final moistureSensor;
   final moistureSensorValue;
 }
+
+// class BarChartData {
+//   BarChartData({this.xValue, this.yValue});
+
+//   List name = ['DHT11', 'Soil Moisture'];
+
+//   BarChartData.fromMap(Map<String, dynamic> dataMap)
+//       : xValue = "name[0]",
+//         yValue = dataMap[2];
+
+//   final xValue;
+//   final yValue;
+// }

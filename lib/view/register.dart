@@ -102,12 +102,12 @@ class _RegisterState extends State<Register> {
                     });
                   } else {
                     setState(() {
+                      showSpinner = false;
                       if (result == null) {
                         error = 'Please supply a valid email or password';
                       } else {
                         error = result;
                       }
-                      showSpinner = false;
                     });
                   }
                 },

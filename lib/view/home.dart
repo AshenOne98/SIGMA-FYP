@@ -116,23 +116,22 @@ class _HomeState extends State<Home> {
               return Column(
                 children: [
                   Expanded(
-                    flex: 2,
+                    flex: 1,
                     child: Center(
-                      child: CircularProgressIndicator(
-                        backgroundColor: Colors.lightBlueAccent,
+                      child: Container(
+                        child: CircularProgressIndicator(
+                          backgroundColor: Colors.lightBlueAccent,
+                        ),
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 40.0,
-                  ),
                   Expanded(
-                    flex: 1,
+                    flex: 0,
                     child: Column(
                       children: [
                         SizedBox(
                           height: 20.0,
-                          width: MediaQuery.of(context).size.width / 1.1,
+                          // width: MediaQuery.of(context).size.width / 1.1,
                           child: Divider(
                             color: Colors.white,
                           ),
